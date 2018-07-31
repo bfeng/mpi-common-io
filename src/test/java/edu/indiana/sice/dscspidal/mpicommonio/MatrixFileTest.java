@@ -2,6 +2,7 @@ package edu.indiana.sice.dscspidal.mpicommonio;
 
 import org.junit.jupiter.api.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -23,7 +24,7 @@ class MatrixFileTest {
             long range = 1_000_000L;
             rowLength = randomIdx(range);
             colLength = randomIdx(range);
-            matrixFile = new MatrixFile("/tmp/matrix-file.test", rowLength, colLength);
+            matrixFile = new MatrixFile(File.createTempFile("matrix-", ".test").getAbsolutePath(), rowLength, colLength);
             matrixFile.open();
         } catch (IOException e) {
             fail(e);
