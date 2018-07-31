@@ -1,9 +1,6 @@
 package edu.indiana.sice.dscspidal.mpicommonio;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 public class MPIFile {
 
@@ -52,7 +49,11 @@ public class MPIFile {
     }
 
     public double readDoubleAt() throws IOException {
-        return randomFile.readDouble();
+        try {
+            return randomFile.readDouble();
+        } catch (EOFException e) {
+            return 0;
+        }
     }
 
     public double readDoubleAt(long pos) throws IOException {
@@ -69,7 +70,7 @@ public class MPIFile {
         randomFile.writeDouble(value);
     }
 
-    public void seekTo(long pos) throws IOException {
+    void seekTo(long pos) throws IOException {
         randomFile.seek(pos * Byte.SIZE);
     }
 
