@@ -12,7 +12,7 @@ public class ReadWriteSparseMatrixExample {
 
     public static void main(String[] args) throws IOException {
         final long rowLength, colLength;
-        rowLength = colLength = 1000;
+        rowLength = colLength = 10;
         System.out.println("Sparse matrix writing...");
         SparseMatrixFile sparseMatrixFile = new SparseMatrixFile("/tmp/sparse-matrix.bin", rowLength, colLength);
         sparseMatrixFile.open();
