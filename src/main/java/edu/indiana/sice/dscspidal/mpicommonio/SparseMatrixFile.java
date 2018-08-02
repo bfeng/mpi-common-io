@@ -1,10 +1,14 @@
 package edu.indiana.sice.dscspidal.mpicommonio;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SparseMatrixFile implements Matrix<Double> {
 
     private static final String MODE = "rws";
+
+    private static List<DataCell> dataCache;
 
     private String pathname;
     private long rowLength;
@@ -50,7 +54,7 @@ public class SparseMatrixFile implements Matrix<Double> {
         data.close();
     }
 
-    public boolean delete() throws IOException {
+    public boolean delete() {
         return indicesFile.delete() && dataFile.delete();
     }
 
@@ -67,26 +71,19 @@ public class SparseMatrixFile implements Matrix<Double> {
     @Override
     public Double get(long rowIdx, long colIdx) {
         double result = 0.0;
-        try {
-            indices.seek(0);
-            data.seek(0);
-            while (true) {
-                try {
-                    long currentRow = indices.readLong();
-                    long currentCol = indices.readLong();
-                    double value = data.readDouble();
-                    if (rowIdx == currentRow && colIdx == currentCol) {
-                        result = value;
-                        break;
-                    }
-                } catch (EOFException e) {
+        if (dataCache == null) {
+            dataCache = this.toFullData();
+        }
+        if (dataCache != null) {
+            for (DataCell each : dataCache) {
+                long currentRow = each.getRowIdx();
+                long currentCol = each.getColIdx();
+                double value = each.getValue();
+                if (rowIdx == currentRow && colIdx == currentCol) {
+                    result = value;
                     break;
                 }
             }
-            indices.seek(indicesPointer);
-            data.seek(dataPointer);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return result;
     }
@@ -102,5 +99,29 @@ public class SparseMatrixFile implements Matrix<Double> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private List<DataCell> toFullData() {
+        try {
+            List<DataCell> result = new ArrayList<>();
+            indices.seek(0);
+            data.seek(0);
+            while (true) {
+                try {
+                    long currentRow = indices.readLong();
+                    long currentCol = indices.readLong();
+                    double value = data.readDouble();
+                    result.add(new DataCell(currentRow, currentCol, value));
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+            indices.seek(indicesPointer);
+            data.seek(dataPointer);
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
