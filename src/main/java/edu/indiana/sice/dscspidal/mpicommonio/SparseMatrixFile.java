@@ -6,7 +6,7 @@ import java.util.List;
 
 public class SparseMatrixFile implements Matrix<Double> {
 
-    private static final String MODE = "rws";
+    private static final String MODE = "rw";
 
     private static List<DataCell> dataCache;
 
@@ -99,6 +99,24 @@ public class SparseMatrixFile implements Matrix<Double> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public double[] getRow(long rowIdx) {
+        double[] result = new double[(int) colLength];
+        if (dataCache == null) {
+            dataCache = this.toFullData();
+        }
+        if (dataCache != null) {
+            for (DataCell each : dataCache) {
+                long currentRow = each.getRowIdx();
+                long currentCol = each.getColIdx();
+                double value = each.getValue();
+                if (currentRow == rowIdx) {
+                    result[(int) currentCol] = value;
+                }
+            }
+        }
+        return result;
     }
 
     private List<DataCell> toFullData() {
