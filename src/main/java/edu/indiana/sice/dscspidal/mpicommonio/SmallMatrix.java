@@ -11,4 +11,6 @@ interface SmallMatrix<T> extends Serializable {
     T get(int rowIdx, int colIdx);
 
     void set(int rowIdx, int colIdx, T value);
+
+    int size();
 }

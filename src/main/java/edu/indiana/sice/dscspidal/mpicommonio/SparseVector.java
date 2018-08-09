@@ -2,7 +2,7 @@ package edu.indiana.sice.dscspidal.mpicommonio;
 
 import java.util.HashMap;
 
-public class SparseVector implements SmallVector<Double> {
+public class SparseVector implements SmallVector<Double>, Sparse {
 
     private final int n;
 
@@ -34,6 +34,11 @@ public class SparseVector implements SmallVector<Double> {
     @Override
     public int size() {
         return n;
+    }
+
+    @Override
+    public double sparsity() {
+        return (double) nnz() / size();
     }
 
     @Override

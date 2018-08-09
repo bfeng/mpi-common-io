@@ -29,6 +29,10 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.21.0</version>
+                <configuration>
+                    <argLine>-Xms4g -Xmx8g</argLine>
+                    <shutdown>kill</shutdown>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.platform</groupId>

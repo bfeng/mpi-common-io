@@ -119,6 +119,22 @@ public class SparseMatrixFile implements Matrix<Double> {
         return result;
     }
 
+    public SparseMatrix toSparseMatrix() {
+        SparseMatrix sparseMatrix = new SparseMatrix((int) rowLength, (int) colLength);
+        if (dataCache == null) {
+            dataCache = this.toFullData();
+        }
+        if (dataCache != null) {
+            for (DataCell each : dataCache) {
+                int currentRow = (int) each.getRowIdx();
+                int currentCol = (int) each.getColIdx();
+                double value = each.getValue();
+                sparseMatrix.set(currentRow, currentCol, value);
+            }
+        }
+        return sparseMatrix;
+    }
+
     private List<DataCell> toFullData() {
         try {
             List<DataCell> result = new ArrayList<>();
