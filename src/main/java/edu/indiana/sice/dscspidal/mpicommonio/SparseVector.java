@@ -1,6 +1,7 @@
 package edu.indiana.sice.dscspidal.mpicommonio;
 
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 public class SparseVector implements SmallVector<Double>, Sparse {
 
@@ -42,7 +43,48 @@ public class SparseVector implements SmallVector<Double>, Sparse {
     }
 
     @Override
+    public double maxPositive() {
+        double result = 0;
+        for (Double v : map.values()) {
+            if (v > result)
+                result = v;
+        }
+        return result;
+    }
+
+    @Override
+    public double minPositive() {
+        double result = Double.MAX_VALUE;
+        for (Double v : map.values()) {
+            if (v > 0 && v < result) {
+                result = v;
+            }
+        }
+        return result;
+    }
+
+    @Override
     public Double dot(SmallVector<Double> that) {
         return null;
+    }
+
+    @Override
+    public Double sum() {
+        Double sum = 0.0;
+        for (Double v : map.values()) {
+            sum += v;
+        }
+        return sum;
+    }
+
+    @Override
+    public void inPlaceTransform(Transform transform) {
+        map.replaceAll((k, v) -> transform.apply(v));
+    }
+
+    @Override
+    public double[] values() {
+        Double[] tmp = map.values().toArray(new Double[nnz()]);
+        return Stream.of(tmp).mapToDouble(Double::doubleValue).toArray();
     }
 }

@@ -2,6 +2,7 @@ package edu.indiana.sice.dscspidal.mpicommonio;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SparseMatrixTest {
@@ -33,5 +34,20 @@ class SparseMatrixTest {
             double result = sm.get(i, j);
             assertEquals(v, result);
         }
+    }
+
+    @Test
+    void testValues() {
+        final int dim = 16_000_000;
+        SparseMatrix sm = new SparseMatrix(dim, dim);
+        double v1 = Math.random();
+        double v2 = Math.random();
+        double v3 = Math.random();
+        double v4 = Math.random();
+        sm.set(0, Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), v1);
+        sm.set(1, Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), v2);
+        sm.set(2, Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), v3);
+        sm.set(3, Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), v4);
+        assertArrayEquals(new double[]{v1, v2, v3, v4}, sm.values());
     }
 }

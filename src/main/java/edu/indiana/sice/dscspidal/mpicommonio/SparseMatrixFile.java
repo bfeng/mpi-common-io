@@ -8,6 +8,8 @@ public class SparseMatrixFile implements Matrix<Double> {
 
     private static final String MODE = "rw";
 
+    private static final String R_ONLY = "r";
+
     private static List<DataCell> dataCache;
 
     private String pathname;
@@ -21,6 +23,9 @@ public class SparseMatrixFile implements Matrix<Double> {
 
     private long indicesPointer;
     private long dataPointer;
+
+    private SparseMatrixFile() {
+    }
 
     public SparseMatrixFile(String pathname, long rowLength, long colLength) {
         this.pathname = pathname;
@@ -153,6 +158,52 @@ public class SparseMatrixFile implements Matrix<Double> {
             indices.seek(indicesPointer);
             data.seek(dataPointer);
             return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Square matrix only
+     *
+     * @param indicesPath indices
+     * @param dataPath    data
+     * @param startRow    inclusive
+     * @param endRow      inclusive
+     * @return partial sparse matrix
+     */
+    public static SparseMatrix loadIntoMemory(String indicesPath, String dataPath, int startRow, int endRow, int dim) {
+        if (startRow < 0 || startRow > endRow || startRow > dim) {
+            throw new RuntimeException("Illegal row range");
+        }
+        try {
+            SparseMatrix sparseMatrix = new SparseMatrix(Math.abs(endRow - startRow) + 1, dim);
+            SparseMatrixFile smf = new SparseMatrixFile();
+            smf.rowLength = dim;
+            smf.colLength = dim;
+            smf.indicesFile = new File(indicesPath);
+            smf.dataFile = new File(dataPath);
+            smf.indices = new RandomAccessFile(smf.indicesFile, R_ONLY);
+            smf.data = new RandomAccessFile(smf.dataFile, R_ONLY);
+
+            while (true) {
+                try {
+                    long currentRow = smf.indices.readLong();
+                    long currentCol = smf.indices.readLong();
+                    double value = smf.data.readDouble();
+
+                    if (currentRow >= startRow && currentRow <= endRow) {
+                        sparseMatrix.set((int) currentRow - startRow, (int) currentCol, value);
+                    }
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+
+            smf.data.close();
+            smf.indices.close();
+            return sparseMatrix;
         } catch (IOException e) {
             e.printStackTrace();
         }

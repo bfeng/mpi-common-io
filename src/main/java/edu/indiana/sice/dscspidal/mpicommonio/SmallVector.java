@@ -13,4 +13,6 @@ interface SmallVector<T> extends Serializable {
     int size();
 
     T dot(SmallVector<T> that);
+
+    T sum();
 }

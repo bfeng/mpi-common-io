@@ -57,4 +57,62 @@ public class SparseMatrix implements SmallMatrix<Double>, Sparse {
     public double sparsity() {
         return (double) nnz() / size();
     }
+
+    @Override
+    public double maxPositive() {
+        double result = 0;
+        for (SparseVector row : rows) {
+            double v = row.maxPositive();
+            if (v > result) {
+                result = v;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public double minPositive() {
+        double result = Double.MAX_VALUE;
+        for (SparseVector row : rows) {
+            double v = row.minPositive();
+            if (v > 0 && v < result) {
+                result = v;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void inPlaceTransform(Transform transform) {
+        for (SparseVector row : rows) {
+            row.inPlaceTransform(transform);
+        }
+    }
+
+    @Override
+    public Double rowSum(int i) {
+        return rows[i].sum();
+    }
+
+    @Override
+    public Double colSum(int j) {
+        Double sum = 0.0;
+        for (SparseVector row : rows) {
+            sum += row.get(j);
+        }
+        return sum;
+    }
+
+    @Override
+    public double[] values() {
+        double[] result = new double[nnz()];
+        int position = 0;
+        for (SparseVector row : rows) {
+            if (row.nnz() > 0) {
+                System.arraycopy(row.values(), 0, result, position, row.nnz());
+                position += row.nnz();
+            }
+        }
+        return result;
+    }
 }
