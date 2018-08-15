@@ -33,8 +33,8 @@ public class SparseVector implements SmallVector<Double>, Sparse {
     }
 
     @Override
-    public int size() {
-        return n;
+    public long size() {
+        return (long) n;
     }
 
     @Override

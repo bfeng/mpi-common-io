@@ -12,7 +12,7 @@ interface SmallMatrix<T> extends Serializable {
 
     void set(int rowIdx, int colIdx, T value);
 
-    int size();
+    long size();
 
     T rowSum(int i);
 

@@ -49,8 +49,8 @@ public class SparseMatrix implements SmallMatrix<Double>, Sparse {
     }
 
     @Override
-    public int size() {
-        return numRows * numCols;
+    public long size() {
+        return (long) numRows * (long) numCols;
     }
 
     @Override

@@ -10,7 +10,7 @@ interface SmallVector<T> extends Serializable {
 
     int nnz();
 
-    int size();
+    long size();
 
     T dot(SmallVector<T> that);
 

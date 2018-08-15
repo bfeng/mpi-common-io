@@ -8,7 +8,7 @@ public interface Sparse {
 
     int nnz();
 
-    int size();
+    long size();
 
     double sparsity();
 

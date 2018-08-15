@@ -50,4 +50,12 @@ class SparseMatrixTest {
         sm.set(3, Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), v4);
         assertArrayEquals(new double[]{v1, v2, v3, v4}, sm.values());
     }
+
+    @Test
+    void testSparsity() {
+        final int dim = 16_000_000;
+        SparseMatrix sm = new SparseMatrix(dim, dim);
+        sm.set(0, 0, 1.0);
+        assertEquals((double) 1 / dim / dim, sm.sparsity());
+    }
 }
