@@ -4,7 +4,7 @@ public class SparseMatrix implements SmallMatrix<Double>, Sparse {
     private final int numRows;
     private final int numCols;
 
-    private final SparseVector[] rows;
+    final SparseVector[] rows;
 
     public SparseMatrix(int numRows, int numCols) {
         this.numRows = numRows;

@@ -7,7 +7,7 @@ public class SparseVector implements SmallVector<Double>, Sparse {
 
     private final int n;
 
-    private final HashMap<Integer, Double> map;
+    final HashMap<Integer, Double> map;
 
     public SparseVector(int n) {
         this.n = n;

@@ -209,4 +209,39 @@ public class SparseMatrixFile implements Matrix<Double> {
         }
         return null;
     }
+
+    private static byte[] longToBytes(long l) {
+        byte[] result = new byte[8];
+        for (int i = 7; i >= 0; i--) {
+            result[i] = (byte) (l & 0xFF);
+            l >>= 8;
+        }
+        return result;
+    }
+
+    public static void dumpToFile(final SparseMatrix sparseMatrix, final String outputDir) {
+        try {
+            SparseMatrixFile sparseMatrixFile = new SparseMatrixFile(outputDir, sparseMatrix.numRows(), sparseMatrix.numCols());
+            sparseMatrixFile.open();
+
+            BufferedOutputStream indexOut = new BufferedOutputStream(new FileOutputStream(sparseMatrixFile.indicesFile));
+            BufferedOutputStream dataOut = new BufferedOutputStream(new FileOutputStream(sparseMatrixFile.dataFile));
+
+            for (int i = 0; i < sparseMatrix.numRows(); i++) {
+                SparseVector row = sparseMatrix.rows[i];
+                for (Integer j : row.map.keySet()) {
+                    indexOut.write(longToBytes(i));
+                    indexOut.write(longToBytes(j));
+                    double v = row.map.get(j);
+                    dataOut.write(longToBytes(Double.doubleToLongBits(v)));
+                }
+            }
+
+            indexOut.close();
+            dataOut.close();
+            sparseMatrixFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
