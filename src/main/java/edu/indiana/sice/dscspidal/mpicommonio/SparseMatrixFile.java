@@ -1,6 +1,7 @@
 package edu.indiana.sice.dscspidal.mpicommonio;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -184,30 +185,39 @@ public class SparseMatrixFile implements Matrix<Double> {
             smf.colLength = dim;
             smf.indicesFile = new File(indicesPath);
             smf.dataFile = new File(dataPath);
-            smf.indices = new RandomAccessFile(smf.indicesFile, R_ONLY);
-            smf.data = new RandomAccessFile(smf.dataFile, R_ONLY);
-
-            while (true) {
-                try {
-                    long currentRow = smf.indices.readLong();
-                    long currentCol = smf.indices.readLong();
-                    double value = smf.data.readDouble();
-
-                    if (currentRow >= startRow && currentRow <= endRow) {
-                        sparseMatrix.set((int) currentRow - startRow, (int) currentCol, value);
-                    }
-                } catch (EOFException e) {
-                    break;
+            BufferedInputStream indexIn = new BufferedInputStream(new FileInputStream(smf.indicesFile));
+            BufferedInputStream dataIn = new BufferedInputStream(new FileInputStream(smf.dataFile));
+            byte[] buf = new byte[8];
+            int len = 0;
+            while (indexIn.available() > 0 && dataIn.available() > 0) {
+                len = indexIn.read(buf);
+                long i = bytesToLong(buf);
+                len = indexIn.read(buf);
+                long j = bytesToLong(buf);
+                len = dataIn.read(buf);
+                double value = ByteBuffer.wrap(buf).getDouble();
+                if (i >= startRow && i <= endRow) {
+                    sparseMatrix.set((int) i - startRow, (int) j, value);
                 }
             }
-
-            smf.data.close();
-            smf.indices.close();
+            indexIn.close();
+            dataIn.close();
             return sparseMatrix;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static long bytesToLong(byte[] bytes) {
+        return (bytes[0] & 0xFFL) << 56
+                | (bytes[1] & 0xFFL) << 48
+                | (bytes[2] & 0xFFL) << 40
+                | (bytes[3] & 0xFFL) << 32
+                | (bytes[4] & 0xFFL) << 24
+                | (bytes[5] & 0xFFL) << 16
+                | (bytes[6] & 0xFFL) << 8
+                | (bytes[7] & 0xFFL);
     }
 
     private static byte[] longToBytes(long l) {
