@@ -8,11 +8,11 @@ interface SmallVector<T> extends Serializable {
 
     T get(int i);
 
-    int nnz();
-
-    long size();
+    int size();
 
     T dot(SmallVector<T> that);
 
     T sum();
+
+    boolean contentEqual(SmallVector<T> that);
 }

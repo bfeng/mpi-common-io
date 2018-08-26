@@ -8,8 +8,6 @@ public interface Sparse {
 
     int nnz();
 
-    long size();
-
     double sparsity();
 
     double maxPositive();

@@ -33,6 +33,12 @@ public class SparseMatrix implements SmallMatrix<Double>, Sparse {
     }
 
     @Override
+    public SmallVector<Double> getRow(int i) {
+        if (i < 0 || i >= numRows) throw new RuntimeException("Illegal index");
+        return rows[i];
+    }
+
+    @Override
     public void set(int i, int j, Double value) {
         if (i < 0 || i >= numRows) throw new RuntimeException("Illegal index");
         if (j < 0 || j >= numCols) throw new RuntimeException("Illegal index");
@@ -101,6 +107,19 @@ public class SparseMatrix implements SmallMatrix<Double>, Sparse {
             sum += row.get(j);
         }
         return sum;
+    }
+
+    @Override
+    public boolean contentEqual(SmallMatrix<Double> that) {
+        if (this.size() != that.size())
+            return false;
+
+        for (int i = 0; i < this.rows.length; i++) {
+            if (!this.rows[i].contentEqual(that.getRow(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

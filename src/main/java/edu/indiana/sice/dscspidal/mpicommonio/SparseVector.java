@@ -33,8 +33,8 @@ public class SparseVector implements SmallVector<Double>, Sparse {
     }
 
     @Override
-    public long size() {
-        return (long) n;
+    public int size() {
+        return n;
     }
 
     @Override
@@ -75,6 +75,17 @@ public class SparseVector implements SmallVector<Double>, Sparse {
             sum += v;
         }
         return sum;
+    }
+
+    @Override
+    public boolean contentEqual(SmallVector<Double> that) {
+        if (this.size() != that.size())
+            return false;
+        for (int i = 0; i < this.size(); i++) {
+            if (this.get(i).compareTo(that.get(i)) != 0)
+                return false;
+        }
+        return true;
     }
 
     @Override

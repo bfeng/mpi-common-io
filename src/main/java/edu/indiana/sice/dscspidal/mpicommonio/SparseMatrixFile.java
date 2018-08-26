@@ -2,6 +2,7 @@ package edu.indiana.sice.dscspidal.mpicommonio;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -250,6 +251,55 @@ public class SparseMatrixFile implements Matrix<Double> {
             indexOut.close();
             dataOut.close();
             sparseMatrixFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static SparseMatrix loadIntoMemory(File matrixFile, int startRow, int endRow, int dim) {
+        if (startRow < 0 || startRow > endRow || startRow > dim) {
+            throw new RuntimeException("Illegal row range");
+        }
+        byte[] buf = new byte[Integer.BYTES * 2 + Double.BYTES];
+        ByteBuffer buffer = ByteBuffer.wrap(buf);
+        try (
+                FileInputStream inputStream = new FileInputStream(matrixFile);
+                FileChannel fc = inputStream.getChannel()
+        ) {
+            SparseMatrix sparseMatrix = new SparseMatrix(Math.abs(endRow - startRow) + 1, dim);
+            while (fc.read(buffer) > 0) {
+                buffer.flip();
+                int i = buffer.getInt(0);
+                int j = buffer.getInt(Integer.BYTES);
+                double v = buffer.getDouble(Integer.BYTES * 2);
+                if (i >= startRow && i <= endRow) {
+                    sparseMatrix.set(i - startRow, j, v);
+                }
+                buffer.clear();
+            }
+            return sparseMatrix;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void dumpToFile(final SparseMatrix sparseMatrix, final File matrixFile) {
+        byte[] buf = new byte[Integer.BYTES * 2 + Double.BYTES];
+        ByteBuffer buffer = ByteBuffer.wrap(buf);
+        try (
+                FileOutputStream outputStream = new FileOutputStream(matrixFile);
+                FileChannel fc = outputStream.getChannel()
+        ) {
+            for (int i = 0; i < sparseMatrix.numRows(); i++) {
+                SparseVector row = sparseMatrix.rows[i];
+                for (Integer j : row.map.keySet()) {
+                    buffer.putInt(i).putInt(j).putDouble(row.map.get(j));
+                    buffer.flip();
+                    fc.write(buffer);
+                    buffer.clear();
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

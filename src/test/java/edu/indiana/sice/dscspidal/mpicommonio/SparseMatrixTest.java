@@ -2,8 +2,10 @@ package edu.indiana.sice.dscspidal.mpicommonio;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class SparseMatrixTest {
 
@@ -57,5 +59,19 @@ class SparseMatrixTest {
         SparseMatrix sm = new SparseMatrix(dim, dim);
         sm.set(0, 0, 1.0);
         assertEquals((double) 1 / dim / dim, sm.sparsity());
+    }
+
+    @Test
+    void testDumpAndLoad() throws IOException {
+        final int dim = 16;
+        SparseMatrix sm = new SparseMatrix(dim, dim);
+        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
+        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
+        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
+        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
+        File matrixFile = File.createTempFile("sparse-matrix-", ".test");
+        SparseMatrixFile.dumpToFile(sm, matrixFile);
+        SparseMatrix result = SparseMatrixFile.loadIntoMemory(matrixFile, 0, dim - 1, dim);
+        assertTrue(sm.contentEqual(result));
     }
 }
