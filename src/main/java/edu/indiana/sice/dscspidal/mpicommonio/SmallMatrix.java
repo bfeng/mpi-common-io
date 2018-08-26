@@ -10,6 +10,8 @@ interface SmallMatrix<T> extends Serializable {
 
     T get(int rowIdx, int colIdx);
 
+    SmallVector<T> getRow(int rowIdx);
+
     void set(int rowIdx, int colIdx, T value);
 
     long size();
@@ -17,4 +19,6 @@ interface SmallMatrix<T> extends Serializable {
     T rowSum(int i);
 
     T colSum(int j);
+
+    boolean contentEqual(SmallMatrix<T> that);
 }
