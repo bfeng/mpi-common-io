@@ -277,7 +277,8 @@ public class SparseMatrixFile implements Matrix<Double> {
                     int j = buffer.getInt(Integer.BYTES + k * pairSize);
                     double v = buffer.getDouble(Integer.BYTES * 2 + k * pairSize);
                     if (i >= startRow && i <= endRow) {
-                        sparseMatrix.set(i - startRow, j, v);
+                        if (v > sparseMatrix.get(i - startRow, j))
+                            sparseMatrix.set(i - startRow, j, v);
                     }
                 }
                 buffer.clear();
