@@ -63,15 +63,16 @@ class SparseMatrixTest {
 
     @Test
     void testDumpAndLoad() throws IOException {
-        final int dim = 16;
-        SparseMatrix sm = new SparseMatrix(dim, dim);
-        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
-        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
-        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
-        sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
-        File matrixFile = File.createTempFile("sparse-matrix-", ".test");
-        SparseMatrixFile.dumpToFile(sm, matrixFile);
-        SparseMatrix result = SparseMatrixFile.loadIntoMemory(matrixFile, 0, dim - 1, dim);
-        assertTrue(sm.contentEqual(result));
+        int[] tests = {10, 10000, 12345, 23456};
+        for (final int dim : tests) {
+            SparseMatrix sm = new SparseMatrix(dim, dim);
+            for (int i = 0; i < dim; i++) {
+                sm.set(Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.toIntExact(Math.round(Math.floor(Math.random() * dim))), Math.random());
+            }
+            File matrixFile = File.createTempFile("sparse-matrix-", ".test");
+            SparseMatrixFile.dumpToFile(sm, matrixFile);
+            SparseMatrix result = SparseMatrixFile.loadIntoMemory(matrixFile, 0, dim - 1, dim);
+            assertTrue(sm.contentEqual(result));
+        }
     }
 }

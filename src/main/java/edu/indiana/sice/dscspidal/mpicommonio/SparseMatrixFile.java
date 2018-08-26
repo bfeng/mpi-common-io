@@ -260,20 +260,25 @@ public class SparseMatrixFile implements Matrix<Double> {
         if (startRow < 0 || startRow > endRow || startRow > dim) {
             throw new RuntimeException("Illegal row range");
         }
-        byte[] buf = new byte[Integer.BYTES * 2 + Double.BYTES];
+        final int pairSize = Integer.BYTES * 2 + Double.BYTES;
+        byte[] buf = new byte[pairSize * 1000];
         ByteBuffer buffer = ByteBuffer.wrap(buf);
         try (
                 FileInputStream inputStream = new FileInputStream(matrixFile);
                 FileChannel fc = inputStream.getChannel()
         ) {
             SparseMatrix sparseMatrix = new SparseMatrix(Math.abs(endRow - startRow) + 1, dim);
-            while (fc.read(buffer) > 0) {
+            int bytesRead = 0;
+            while ((bytesRead = fc.read(buffer)) > 0) {
                 buffer.flip();
-                int i = buffer.getInt(0);
-                int j = buffer.getInt(Integer.BYTES);
-                double v = buffer.getDouble(Integer.BYTES * 2);
-                if (i >= startRow && i <= endRow) {
-                    sparseMatrix.set(i - startRow, j, v);
+                int nPairs = bytesRead / pairSize;
+                for (int k = 0; k < nPairs; k++) {
+                    int i = buffer.getInt(k * pairSize);
+                    int j = buffer.getInt(Integer.BYTES + k * pairSize);
+                    double v = buffer.getDouble(Integer.BYTES * 2 + k * pairSize);
+                    if (i >= startRow && i <= endRow) {
+                        sparseMatrix.set(i - startRow, j, v);
+                    }
                 }
                 buffer.clear();
             }
@@ -285,7 +290,8 @@ public class SparseMatrixFile implements Matrix<Double> {
     }
 
     public static void dumpToFile(final SparseMatrix sparseMatrix, final File matrixFile) {
-        byte[] buf = new byte[Integer.BYTES * 2 + Double.BYTES];
+        final int pairSize = Integer.BYTES * 2 + Double.BYTES;
+        byte[] buf = new byte[pairSize * 1000];
         ByteBuffer buffer = ByteBuffer.wrap(buf);
         try (
                 FileOutputStream outputStream = new FileOutputStream(matrixFile);
@@ -295,10 +301,17 @@ public class SparseMatrixFile implements Matrix<Double> {
                 SparseVector row = sparseMatrix.rows[i];
                 for (Integer j : row.map.keySet()) {
                     buffer.putInt(i).putInt(j).putDouble(row.map.get(j));
-                    buffer.flip();
-                    fc.write(buffer);
-                    buffer.clear();
+                    if (buffer.position() >= buffer.capacity()) {
+                        buffer.flip();
+                        fc.write(buffer);
+                        buffer.clear();
+                    }
                 }
+            }
+            if (buffer.position() > 0) {
+                buffer.flip();
+                fc.write(buffer);
+                buffer.clear();
             }
         } catch (IOException e) {
             e.printStackTrace();
