@@ -15,21 +15,21 @@ public class ParallelReadWriteExample {
     private static final Object lock = new Object();
 
     private static void println(String line) throws MPIException {
-        window.lockAll(MPI.LOCK_EXCLUSIVE);
+        // window.lockAll(MPI.LOCK_EXCLUSIVE);
         synchronized (lock) {
             int myRank = MPI.COMM_WORLD.getRank();
             int size = MPI.COMM_WORLD.getSize();
             System.out.printf("Rank[%d/%d]:%s\n", myRank, size, line);
             System.out.flush();
         }
-        window.unlockAll();
+        // window.unlockAll();
     }
 
     public static void main(String[] args) throws MPIException, IOException {
         MPI.Init(args);
 
-        window = new Win(MPI.INFO_NULL, MPI.COMM_WORLD);
-        window.fence(MPI.MODE_NOPRECEDE);
+        // window = new Win(MPI.INFO_NULL, MPI.COMM_WORLD);
+        // window.fence(MPI.MODE_NOPRECEDE);
 
         println("Init");
         println(Arrays.toString(args));
@@ -56,7 +56,7 @@ public class ParallelReadWriteExample {
 
         println("Finalize");
 
-        window.free();
+        // window.free();
         MPI.COMM_WORLD.barrier();
         MPI.Finalize();
     }
