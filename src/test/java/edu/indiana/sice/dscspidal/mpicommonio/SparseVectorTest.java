@@ -2,8 +2,7 @@ package edu.indiana.sice.dscspidal.mpicommonio;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SparseVectorTest {
 
@@ -41,5 +40,20 @@ class SparseVectorTest {
         sv.put(i, v);
 
         assertArrayEquals(new double[]{v}, sv.values());
+    }
+
+    @Test
+    void testFromBytes() {
+        final int _100M = 100_000_000;
+        final int i = Math.toIntExact(Math.round(Math.floor(Math.random() * _100M)));
+        double v = Math.random();
+        SparseVector sv = new SparseVector(_100M);
+        sv.put(i, v);
+
+        byte[] raw = sv.toBytes();
+
+        SparseVector v2 = SparseVector.fromBytes(_100M, raw);
+
+        assertTrue(sv.contentEqual(v2));
     }
 }

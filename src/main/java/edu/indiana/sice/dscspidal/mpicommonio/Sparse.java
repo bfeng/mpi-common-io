@@ -17,4 +17,6 @@ public interface Sparse {
     void inPlaceTransform(Transform transform);
 
     double[] values();
+
+    byte[] toBytes();
 }

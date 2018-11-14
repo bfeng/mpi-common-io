@@ -1,5 +1,6 @@
 package edu.indiana.sice.dscspidal.mpicommonio;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
@@ -39,7 +40,7 @@ public class SparseVector implements SmallVector<Double>, Sparse {
 
     @Override
     public double sparsity() {
-        return (double) nnz() / size();
+        return 1.0 - (double) nnz() / size();
     }
 
     @Override
@@ -97,5 +98,36 @@ public class SparseVector implements SmallVector<Double>, Sparse {
     public double[] values() {
         Double[] tmp = map.values().toArray(new Double[nnz()]);
         return Stream.of(tmp).mapToDouble(Double::doubleValue).toArray();
+    }
+
+    @Override
+    public byte[] toBytes() {
+        byte[] raw = new byte[this.nnz() * (Integer.BYTES + Double.BYTES)];
+
+        ByteBuffer buf = ByteBuffer.wrap(raw);
+
+        for (Integer key : map.keySet()) {
+            buf.putInt(key);
+            buf.putDouble(map.get(key));
+        }
+
+        return raw;
+    }
+
+    public static SparseVector fromBytes(final int length, byte[] bytes) {
+        SparseVector sparseVector = new SparseVector(length);
+
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        int i = 0;
+        while (i < bytes.length) {
+            int key = buffer.getInt(i);
+            i += Integer.BYTES;
+            double val = buffer.getDouble(i);
+            i += Double.BYTES;
+
+            sparseVector.put(key, val);
+        }
+
+        return sparseVector;
     }
 }

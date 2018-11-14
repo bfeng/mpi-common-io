@@ -1,6 +1,7 @@
 package edu.indiana.sice.dscspidal.mpicommonio.examples;
 
 import edu.indiana.sice.dscspidal.mpicommonio.Matrix;
+import edu.indiana.sice.dscspidal.mpicommonio.SparseVector;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -19,5 +20,23 @@ class ExampleUtils {
             }
             System.out.println();
         }
+    }
+
+    static double[] initDenseVector(int length) {
+        double[] ret = new double[length];
+        for (int i = 0; i < length; i++) {
+            ret[i] = Math.random();
+        }
+        return ret;
+    }
+
+    static SparseVector initSparseVector(int length, double sparsity) {
+        SparseVector sv = new SparseVector(length);
+        for (int i = 0; i < length; i++) {
+            if(Math.random() >= sparsity) {
+                sv.put(i, Math.random());
+            }
+        }
+        return sv;
     }
 }

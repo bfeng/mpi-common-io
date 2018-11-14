@@ -134,4 +134,9 @@ public class SparseMatrix implements SmallMatrix<Double>, Sparse {
         }
         return result;
     }
+
+    @Override
+    public byte[] toBytes() {
+        return new byte[0];
+    }
 }
