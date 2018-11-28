@@ -61,7 +61,7 @@ public class SparseMatrix implements SmallMatrix<Double>, Sparse {
 
     @Override
     public double sparsity() {
-        return (double) nnz() / size();
+        return 1.0 - (double) nnz() / size();
     }
 
     @Override

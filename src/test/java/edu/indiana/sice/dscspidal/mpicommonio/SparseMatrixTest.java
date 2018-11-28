@@ -58,7 +58,7 @@ class SparseMatrixTest {
         final int dim = 16_000_000;
         SparseMatrix sm = new SparseMatrix(dim, dim);
         sm.set(0, 0, 1.0);
-        assertEquals((double) 1 / dim / dim, sm.sparsity());
+        assertEquals(((double) dim * dim - 1) / dim / dim, sm.sparsity(), 1e-10);
     }
 
     @Test
